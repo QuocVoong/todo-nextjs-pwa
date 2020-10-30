@@ -1,28 +1,49 @@
-const Koa = require('koa')
-const next = require('next')
-const Router = require('koa-router')
-const {join} = require('path')
+const Koa      = require('koa');
+const next     = require('next');
+const Router   = require('koa-router');
+const bodyParser     = require('koa-body');
+const { join } = require('path');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
-const port = parseInt(process.env.PORT, 10) || 4000
-const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev })
-const handle = app.getRequestHandler()
+dotenv.config()
+const port   = parseInt(process.env.PORT, 10) || 4000;
+const dev    = process.env.NODE_ENV !== 'production';
+const app    = next({ dev });
+const handle = app.getRequestHandler();
+const apiRouter      = new Router({ prefix: '/api' });
+
+mongoose.connect(process.env.MONGODB_CONNECTION, {
+  useCreateIndex:     true,
+  useNewUrlParser:    true,
+  useUnifiedTopology: true,
+  useFindAndModify:   false,
+});
 
 app.prepare()
   .then(() => {
-    const server = new Koa()
-    const router = new Router()
+    const server = new Koa();
+    const router = new Router();
+
+    server.use(bodyParser({
+      multipart: true,
+    }));
 
     router.get('/service-worker.js', async ctx => {
-      const pathname = await join(__dirname, '../', '.next', 'service-worker.js')
-      ctx.body = await app.serveStatic(ctx.req, ctx.res, pathname)
-      ctx.respond = true
-    })
+      const pathname = await join(__dirname, '../', '.next', 'service-worker.js');
+      ctx.body       = await app.serveStatic(ctx.req, ctx.res, pathname);
+      ctx.respond    = true;
+    });
 
     router.get('/healthcheck', async ctx => {
-      ctx.body = 'ok'
-      ctx.respond = true
-    })
+      ctx.body    = 'ok';
+      ctx.respond = true;
+    });
+
+    require('./controllers')(apiRouter);
+    router.use(apiRouter.routes());
+    server.use(router.routes());
+    server.use(router.allowedMethods());
 
     router.get('*', async ctx => {
       await handle(ctx.req, ctx.res)
@@ -34,10 +55,18 @@ app.prepare()
       await next()
     })
 
-    server.use(router.routes())
+    const handleError = (err, ctx) => {
+      console.log('err: ', err);
+      if (ctx == null) {
+        console.error('Error: ', 'Unhandled exception occured - ' + JSON.stringify(err));
+      }
+    };
+
+    server.on('error', handleError);
+
     server.listen(port, (err) => {
-      if (err) throw err
-      console.log(`> Ready on http://localhost:${port}`)
-    })
-  })
+      if (err) throw err;
+      console.log(`> Ready on http://localhost:${port}`);
+    });
+  });
 
