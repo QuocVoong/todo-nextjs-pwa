@@ -1,15 +1,17 @@
 import { command }     from '../../../utils/axios'
 
-export const createBoard = ({ data }) => {
-  return command({ data: {
+export const createBoard = async ({ formData }) => {
+  const { data: result } = await command({ data: {
       commandName: 'createBoard',
-      ...data
+      ...formData
     }});
+  return result;
 };
 
-export const deleteBoard = ({ data }) => {
-  return command({ data: {
+export const deleteBoard = async ({ formData }) => {
+  const { data: result } = await command({ data: {
       commandName: 'deleteBoard',
-      ...data
+      ...formData
     }});
+  return result;
 };

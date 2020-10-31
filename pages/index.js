@@ -1,14 +1,12 @@
-import React, { useState }                                            from 'react';
-import { get }                                                        from 'lodash';
-import Link                                                           from 'next/link';
-import { useQuery, useMutation, useQueryCache, ReactQueryCacheProvider } from 'react-query';
-import { FaTimesCircle }                                              from 'react-icons/fa';
-import { query }                                                      from '../utils/axios';
-import Button                                                         from '../components/Button';
-import styled                                                         from 'styled-components';
-import { findBoards }                                                 from './api/query';
-import axios                                                          from 'axios';
-import { createBoard, deleteBoard }                                   from './api/mutation';
+import React, { useState }                      from 'react';
+import { get }                                  from 'lodash';
+import Link                                     from 'next/link';
+import { useQuery, useMutation, useQueryCache } from 'react-query';
+import { FaTimesCircle }                        from 'react-icons/fa';
+import Button                                   from '../components/Button';
+import styled                                   from 'styled-components';
+import { findBoards }                           from './api/query';
+import { createBoard, deleteBoard }             from './api/mutation';
 
 const StyledHome = styled.div`
   display: flex;
@@ -153,29 +151,24 @@ const BoardList = ({ boards, isLoading, onDeleteBoard }) => {
   );
 };
 
-
 export default function Home({ initialData }) {
-  const [newBoardTitle, setNewBoardTitle] = useState('');
-  const { data, status, isLoading }       = useQuery('boards', findBoards, {
+  const [newBoardTitle, setNewBoardTitle]             = useState('');
+  const { data, status, isLoading }                   = useQuery('boards', findBoards, {
     initialData,
-    // refetchOnWindowFocus: false,
-    // refetchInterval: 1000,
+    refetchOnWindowFocus: false,
   });
-  const boards                            = get(data, 'result.data');
-  const cache = useQueryCache();
-
+  const boards                                        = get(data, 'result.data');
+  const cache                                         = useQueryCache();
   const [createBoardMutate, { error: creatingError }] = useMutation(createBoard, {
     onSuccess: () => {
-      // queryCache.invalidateQueries('boards')
-      cache.invalidateQueries('boards')
+      cache.invalidateQueries('boards');
       setNewBoardTitle('');
     },
   });
 
   const [deleteBoardMutate, { error: deleteError }] = useMutation(deleteBoard, {
     onSuccess: () => {
-      // Query Invalidations
-      // queryCache.invalidateQueries('boards')
+      cache.invalidateQueries('boards');
     },
   });
 
@@ -186,24 +179,12 @@ export default function Home({ initialData }) {
     onAddBoard(newBoardTitle);
   };
 
-  const handleGenerateExampleBoard = (event) => {
-    event.preventDefault();
-    onGenerateExampleBoard();
-  };
-
   const onAddBoard = async (boardTitle) => {
-    await createBoardMutate({ data: { title: boardTitle } });
+    await createBoardMutate({ formData: { title: boardTitle } });
   };
 
   const onDeleteBoard = async (boardId) => {
-    await deleteBoardMutate({ data: { _id: boardId } });
-  };
-
-  const onGenerateExampleBoard = async () => {
-    // setIsLoading(true);
-    // await dispatch(generateExampleBoard()).then(() => {
-    //   setIsLoading(false);
-    // });
+    await deleteBoardMutate({ formData: { _id: boardId } });
   };
 
   if (isLoading) return 'Loading...';
