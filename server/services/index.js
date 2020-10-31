@@ -1,8 +1,9 @@
-const { findBoards } = require('./boardService')
+const { findBoards, createBoard, deleteBoard } = require('./boardService')
 
 module.exports = {
   command: {
-
+    createBoard,
+    deleteBoard
   },
   query: {
     findBoards

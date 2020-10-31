@@ -1,13 +1,13 @@
 const { isEmpty, size, trim }                         = require('lodash');
 const { OK, UNPROCESSABLE_ENTITY, BAD_REQUEST } = require('http-status-codes');
-const boardSchema                               = require('../schemas/board');
+const todoSchema                               = require('../schemas/todo');
 
-const findBoards = async ({ find = {}, skip = 0, limit = 10, select, sort = { created: 1 } }) => {
+const findTodos = async ({ find = {}, skip = 0, limit = 10, select, sort = { created: 1 } }) => {
   const innerSelect = isEmpty(select) ? { _id: 1 } : select;
 
   const [data, count] = await Promise.all([
-    boardSchema.find(find).sort(sort).skip(skip).limit(limit).select(innerSelect),
-    limit && boardSchema.find(find).countDocuments()
+    todoSchema.find(find).sort(sort).skip(skip).limit(limit).select(innerSelect),
+    limit && todoSchema.find(find).countDocuments()
   ]);
 
   return {
@@ -20,17 +20,27 @@ const findBoards = async ({ find = {}, skip = 0, limit = 10, select, sort = { cr
   };
 };
 
-const createBoard = async (model, ctx) => {
+const createTodo = async (model, ctx) => {
+  if (size(trim(model.board_id)) === 0) {
+    return {
+      status: BAD_REQUEST,
+      error:  {
+        message: 'invalid board_id',
+        model
+      }
+    };
+  }
   const currentTime = Math.floor(Date.now() / 1000);
   try {
-    const board = await boardSchema.create({
+    const todo = await todoSchema.create({
       title:   model.title,
+      board_id: model.board_id,
       created: currentTime,
       latest:  currentTime
     });
     return {
       status: OK,
-      result: [board]
+      result: [todo]
     };
   } catch (error) {
     return {
@@ -39,7 +49,7 @@ const createBoard = async (model, ctx) => {
   }
 };
 
-const deleteBoard = async (model, ctx) => {
+const deleteTodo = async (model, ctx) => {
   const { _id } = model;
   if (size(trim(_id)) === 0) {
     return {
@@ -51,8 +61,8 @@ const deleteBoard = async (model, ctx) => {
     };
   }
   try {
-    const dbModel = await boardSchema.findById(_id);
-    await boardSchema.deleteOne({ _id });
+    const dbModel = await todoSchema.findById(_id);
+    await todoSchema.deleteOne({ _id });
     return {
       status: OK,
     };
@@ -65,7 +75,7 @@ const deleteBoard = async (model, ctx) => {
 };
 
 module.exports = {
-  findBoards,
-  createBoard,
-  deleteBoard
+  findTodos,
+  createTodo,
+  deleteTodo
 };
