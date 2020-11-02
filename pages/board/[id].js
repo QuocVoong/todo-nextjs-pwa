@@ -29,6 +29,7 @@ import {
   deleteCard, editCard
 }                                               from '../api/mutation';
 import { useMutation, useQuery, useQueryCache } from 'react-query';
+import Link                                     from 'next/link';
 
 const StyledBoard = styled.div`
   display: flex;
@@ -398,7 +399,7 @@ export default function Board({ initialData }) {
 
   if (isBoardLoading) return 'Loading...';
 
-  const board = boardData.result.data;
+  const board = boardData.result.data[0];
 
   const handleDragEnd = async ({ draggableId, source, destination, type }) => {
     if (!destination) {
@@ -482,7 +483,10 @@ export default function Board({ initialData }) {
 
   return <>
     <BoardTitleWrapper>
-      <BoardTitle>{board.title}</BoardTitle>
+      <BoardTitle>
+        <Link href="/" as={`/`}><a style={{ padding: 30, textDecoration: 'none' }}> &lt; &lt; </a></Link>
+        {board.title}
+      </BoardTitle>
     </BoardTitleWrapper>
     <StyledBoard numLists={todoList.length}>
       <DragDropContext onDragEnd={handleDragEnd}>

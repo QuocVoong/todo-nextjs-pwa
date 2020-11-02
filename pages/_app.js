@@ -5,8 +5,8 @@ import { ReactQueryDevtools } from 'react-query-devtools'
 const queryCache = new QueryCache();
 const queryConfig = {
   queries: {
-    staleTime: 1000,
-    cacheTime: 3000,
+    staleTime: 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
   }
 }
 export default function App({ Component, pageProps }) {
