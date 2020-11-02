@@ -22,10 +22,12 @@
     "next": "9.3.3",
     "next-offline": "^2.7.1",
     "react": "^16.13.0",
+    "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.13.0",
     "react-icons": "^3.11.0",
     "react-query": "^2.25.2",
     "react-query-devtools": "^2.6.0",
+    "react-textarea-autosize": "^8.2.0",
     "shortid": "^2.2.16",
     "styled-components": "4.4.1"
   }
