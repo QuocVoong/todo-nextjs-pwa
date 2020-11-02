@@ -31,9 +31,6 @@ const version = 'v2::';
 self.addEventListener("fetch", function(event) {
   console.log('WORKER: fetch event in progress.');
 
-  // check if request is made by chrome extensions or web page
-  if (!(event.request.url.indexOf('http') === 0)) return;
-
   /* We should only cache GET requests, and deal with the rest of method in the
      client-side, by handling failed POST,PUT,PATCH,etc. requests.
   */
