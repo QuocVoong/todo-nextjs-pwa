@@ -141,7 +141,7 @@ const BoardList = ({ boards, isLoading, onDeleteBoard }) => {
     <>
       {boards && boards.map((board) => (
         <Row key={`row-${board._id}`}>
-          <Link href="board/[id]" as={`board/${board._id}`}><a>{board.title}</a></Link>
+          <Link href="/board/[id]" as={`/board/${board._id}`}><a>{board.title}</a></Link>
           <StyledDeleteBoardButton onClick={(e) => handleDeleteBoard(e, board._id)}>
             <FaTimesCircle size={18}/>
           </StyledDeleteBoardButton>
@@ -157,6 +157,7 @@ export default function Home({ initialData }) {
     initialData,
     refetchOnWindowFocus: false,
   });
+
   const boards                                        = get(data, 'result.data');
   const cache                                         = useQueryCache();
   const [createBoardMutate, { error: creatingError }] = useMutation(createBoard, {

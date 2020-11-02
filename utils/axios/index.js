@@ -28,15 +28,13 @@ export const command = ({
 
 export const query = ({
                         data,
-                        headers = {
-                          'Content-Type': 'application/json',
-                        },
+                        headers,
                         cancelToken
                       }) => {
   return axios({
-    method: 'post',
+    method: 'get',
     url:    `${API_ENDPOINT}/${QUERY}`,
-    data,
+    params: data,
     headers,
     cancelToken
   });

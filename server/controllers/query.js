@@ -5,7 +5,7 @@ const { query } = require('../services');
 
 module.exports = async (ctx) => {
   try {
-    const { body: { queryName, params } } = ctx.request;
+    const { query: { queryName, params } } = ctx.request;
     const service                         = get(query, queryName);
     if (!service) {
       ctx.status = NOT_FOUND;
@@ -13,7 +13,7 @@ module.exports = async (ctx) => {
       return;
     }
 
-    const { status, result, error } = await service(params || {});
+    const { status, result, error } = await service(JSON.parse(params) || {});
     ctx.status                      = status;
     ctx.body                        = { result, error };
   } catch (e) {

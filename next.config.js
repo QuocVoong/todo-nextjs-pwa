@@ -1,7 +1,8 @@
-const withOffline = require('next-offline')
+const withPWA = require('next-pwa')
 
-module.exports = withOffline({
-  webpack(config, options) {
-    return config
+module.exports = withPWA({
+  pwa: {
+    dest: 'public',
+    swSrc: 'service_worker.js'
   }
-});
+})
